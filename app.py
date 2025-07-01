@@ -34,5 +34,31 @@ def index():
 def success():
     return render_template("success.html")
 
+@app.route("/todo")
+def todo():
+    return render_template("todo.html")
+
+
+@app.route("/submittodoitem", methods=["POST"])
+def submit_todo_item():
+    item_name = request.form.get("itemName")
+    item_desc = request.form.get("itemDescription")
+
+    if not item_name or not item_desc:
+        flash("All fields are required for To-Do.")
+        return redirect(url_for("todo"))
+    
+    try:
+        # Save the To-Do item in a separate collection
+        mongo.db.todos.insert_one({
+            "itemName": item_name,
+            "itemDescription": item_desc
+        })
+        flash("To-Do item submitted successfully!")
+        return redirect(url_for("todo"))
+    except Exception as e:
+        flash(f"Error saving To-Do item: {str(e)}")
+        return redirect(url_for("todo"))
+
 if __name__ == "__main__":
     app.run(debug=True)
