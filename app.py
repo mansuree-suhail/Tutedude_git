@@ -34,11 +34,14 @@ def index():
 def success():
     return render_template("success.html")
 
+@app.route("/todo")
+def todo():
+    return render_template("todo.html")
+
 
 @app.route("/submittodoitem", methods=["POST"])
 def submit_todo_item():
     item_name = request.form.get("itemName")
-    item_id = request.form.get("itemId")
     item_desc = request.form.get("itemDescription")
 
     if not item_name or not item_desc:
@@ -49,7 +52,34 @@ def submit_todo_item():
         # Save the To-Do item in a separate collection
         mongo.db.todos.insert_one({
             "itemName": item_name,
-            "itemId": item_id
+            "itemDescription": item_desc
+        })
+        flash("To-Do item submitted successfully!")
+        return redirect(url_for("todo"))
+    except Exception as e:
+        flash(f"Error saving To-Do item: {str(e)}")
+        return redirect(url_for("todo"))
+
+
+@app.route("/submittodoitem", methods=["POST"])
+def submit_todo_item():
+    item_name = request.form.get("itemName")
+    item_id = request.form.get("itemId")
+    item_uuid = request.form.get("itemUuid")
+    item_hash = request.form.get("itemHash")
+    item_desc = request.form.get("itemDescription")
+
+    if not item_name or not item_desc:
+        flash("All fields are required for To-Do.")
+        return redirect(url_for("todo"))
+    
+    try:
+        # Save the To-Do item in a separate collection
+        mongo.db.todos.insert_one({
+            "itemName": item_name,
+            "itemId": item_id,
+            "itemUuid":item_uuid,
+            "itemhash":item_hash,
             "itemDescription": item_desc
         })
         flash("To-Do item submitted successfully!")
