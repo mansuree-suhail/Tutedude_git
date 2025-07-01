@@ -10,6 +10,10 @@ load_dotenv()
 app = Flask(__name__)
 app.secret_key = 'any_secret_key'  # -->> needed for flash messages
 
+@app.route("/todo")
+def todo():
+    return render_template("todo.html")
+
 #  for Set up MongoDB
 app.config["MONGO_URI"] = os.getenv("MONGO_URI")
 mongo = PyMongo(app)
